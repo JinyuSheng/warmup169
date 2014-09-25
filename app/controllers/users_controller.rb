@@ -63,8 +63,24 @@ class UsersController < ApplicationController
   end
 
   def unitTests
-    render :json => { :nrFailed => 0, :output =>"", :totalTests => 20}
+    # RSpec::Core::Runner.run(['spec'], err, out)
+    system("rspec > output.txt")
+    output = File.read('output.txt')
+    failures = 0
+    examples = 20
+    File.open("output.txt", "r") do |infile|
+      while (line = infile.gets)
+        if(line =~ /(.*)[0-9]+ examples, [0-9]+ failures(.*)/)
+          p line.split(' ')
+          failures = line.split(' ')[2]
+          examples = line.split(' ')[0]
+        end
+      end
+    end
+    system("rm -f output.txt")
+    render :json => { :nrFailed => failures.to_i, :output => output, :totalTests => examples.to_i}
   end
+
   # POST /users
   # POST /users.json
   def create

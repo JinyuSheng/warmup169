@@ -38,9 +38,4 @@ RSpec.describe User, :type => :model do
  	before { @user.password = ""}
  	it { should be_valid}
  end
- describe "after data has been removed"
- 	before do
- 		ActiveRecord::Base.subclasses.each(&:delete_all)
- 	end
- it {should_not be_valid}
 end

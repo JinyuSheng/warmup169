@@ -38,6 +38,21 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  # def silence_output
+  #     @original_stderr = $stderr
+  #     @original_stdout = $stdout
+  #     config.before(:all) do 
+  #       $stderr = File.new(File.join(File.dirname(__FILE__), 'dev', 'null.txt'), 'w')
+  #       $stdout = File.new(File.join(File.dirname(__FILE__), 'dev', 'null.txt'), 'w')
+  #     end
+  #     config.after(:all) do
+  #       $stderr = original_stderr
+  #       $stdout = original_stdout
+  #     end
+  # end
+end
+
+
 # The settings below are suggested to provide a good initial experience
 # with RSpec, but feel free to customize to your heart's content.
 =begin
@@ -82,4 +97,3 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 =end
-end
