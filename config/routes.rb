@@ -6,6 +6,10 @@ Rails.application.routes.draw do
   match '/signup',  to: 'users#new',            via: 'get'
   match '/signin',  to: 'sessions#new',         via: 'get'
   match '/signout', to: 'sessions#destroy',     via: 'delete'
+  match '/users/login', to: 'users#login',            via: 'post'
+  match '/users/add', to: 'users#add',                via: 'post'
+  match '/TESTAPI/resetFixture', to: 'users#resetFixture', via: 'post'
+  match '/TESTAPI/unitTests', to: 'users#unitTests',        via: 'post'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

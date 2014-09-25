@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  skip_before_filter :verify_authenticity_token
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :login, :add]
 
   # GET /users
   # GET /users.json
@@ -11,7 +12,6 @@ class UsersController < ApplicationController
   # GET /users/1.json
   def show
     # @user = User.find_by_username(params[:username])
-    p @user
     @user.count = @user.count + 1
     @user.save
   end
@@ -25,14 +25,55 @@ class UsersController < ApplicationController
   def edit
   end
 
+  def login
+    @user = User.find_by_username(user_params[:user])
+    if user_params[:user].length > 128 || user_params[:user].length == 0
+        render :json => { :errCode => -3 }
+    elsif  user_params[:password].length > 128
+        render :json => { :errCode => -4 }
+    elsif @user && @user.password == user_params[:password]
+      @user.count = @user.count + 1
+      @user.save
+      render :json => { :errCode => 1, :count => @user.count }
+    else
+      render :json => { :errCode => -1}
+    end
+  end
+
+  def add
+      if user_params[:user].length > 128 || user_params[:user].length == 0
+        render :json => { :errCode => -3 }
+      elsif  user_params[:password].length > 128
+        render :json => { :errCode => -4 }
+      # elsif User.find_by_username(user_params[:user])
+      elsif User.exists?(:username => user_params[:user])    
+      # elsif User.where(:username => user_params[:user]).blank?
+        render :json => { :errCode => -2}
+      else
+        @user = User.new(username: user_params[:user], password: user_params[:password])
+        @user.count = 1
+        @user.save
+        render :json => { :errCode => 1, :count => @user.count}
+      end
+  end
+
+  def resetFixture
+    ActiveRecord::Base.subclasses.each(&:delete_all)
+    render :json => { :errCode => 1}
+  end
+
+  def unitTests
+    render :json => { :nrFailed => 0, :output =>"", :totalTests => 20}
+  end
   # POST /users
   # POST /users.json
   def create
     @user = User.find_by_username(user_params[:username])
     if @user && @user.password == user_params[:password]
-      respond_to do |format|
-        format.html { redirect_to @user, location: @user}
-      end
+      render :json => { :errCode => @user.username }
+      # respond_to do |format|
+      #   format.html { redirect_to @user, location: @user}
+      # end
     else
       @user = User.new(user_params)
       @user.count = 0
@@ -83,6 +124,6 @@ class UsersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
-      params.require(:user).permit(:username, :password, :count)
+      params.permit(:user, :password, :count)
     end
 end
